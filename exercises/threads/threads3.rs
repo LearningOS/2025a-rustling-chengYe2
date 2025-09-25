@@ -3,8 +3,6 @@
 // Execute `rustlings hint threads3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
@@ -56,9 +54,13 @@ fn main() {
     send_tx(queue, tx);
 
     let mut total_received: u32 = 0;
+    // 当接收到所有预期的消息后退出循环
     for received in rx {
         println!("Got: {}", received);
         total_received += 1;
+        if total_received == queue_length {
+            break;
+        }
     }
 
     println!("total numbers received: {}", total_received);
