@@ -27,7 +27,14 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
+// Helper function to safely convert i16 to u8
+fn safe_convert(value: i16) -> Result<u8, IntoColorError> {
+    if value >= 0 && value <= 255 {
+        Ok(value as u8)
+    } else {
+        Err(IntoColorError::IntConversion)
+    }
+}
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,6 +48,12 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (r, g, b) = tuple;
+        Ok(Color {
+            red: safe_convert(r)?,
+            green: safe_convert(g)?,
+            blue: safe_convert(b)?
+        })
     }
 }
 
@@ -48,6 +61,11 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        Ok(Color {
+            red: safe_convert(arr[0])?,
+            green: safe_convert(arr[1])?,
+            blue: safe_convert(arr[2])?
+        })
     }
 }
 
@@ -55,6 +73,16 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        // Check if slice has exactly 3 elements
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        
+        Ok(Color {
+            red: safe_convert(slice[0])?,
+            green: safe_convert(slice[1])?,
+            blue: safe_convert(slice[2])?
+        })
     }
 }
 
