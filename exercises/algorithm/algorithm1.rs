@@ -1,8 +1,6 @@
-/*
-	single linked list merge
+/*	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,14 +67,60 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
+		// 创建一个新的空链表来存储合并结果
+		let mut result = LinkedList::new();
+		
+		// 同时遍历两个链表，比较节点值并按顺序添加到结果链表
+		let mut current_a = list_a.start;
+		let mut current_b = list_b.start;
+		
+		while current_a.is_some() && current_b.is_some() {
+			// 解包两个当前节点指针
+			let node_a = current_a.unwrap();
+			let node_b = current_b.unwrap();
+			
+			// 比较节点值
+			let val_a = unsafe { &(*node_a.as_ptr()).val };
+			let val_b = unsafe { &(*node_b.as_ptr()).val };
+			
+			// 由于我们不能直接复制节点值（因为不知道T是否实现了Copy trait），
+			// 所以我们需要先将两个链表的所有值收集到一个vector中，然后排序
+			break;
+		}
+		
+		// 更简单的方法：将两个链表的所有值收集到vector中，排序后重新构建链表
+		let mut values = Vec::new();
+		
+		// 收集第一个链表的值
+		let mut current = list_a.start;
+		while let Some(node) = current {
+			let val = unsafe { std::ptr::read(&(*node.as_ptr()).val) };
+			values.push(val);
+			current = unsafe { (*node.as_ptr()).next };
+		}
+		
+		// 收集第二个链表的值
+		current = list_b.start;
+		while let Some(node) = current {
+			let val = unsafe { std::ptr::read(&(*node.as_ptr()).val) };
+			values.push(val);
+			current = unsafe { (*node.as_ptr()).next };
+		}
+		
+		// 排序值
+		values.sort_by(|a, b| unsafe {
+			// 安全的比较，需要T实现PartialOrd
+			std::ptr::read(a as *const T) < std::ptr::read(b as *const T)
+		});
+		
+		// 从排序后的值构建新链表
+		for val in values {
+			result.add(val);
+		}
+		
+		result
 	}
 }
 

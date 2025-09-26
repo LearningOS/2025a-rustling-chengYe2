@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,44 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 扩展items向量并添加新值
+        self.count += 1;
+        if self.count < self.items.capacity() {
+            self.items[self.count] = value;
+        } else {
+            self.items.push(value);
+        }
+        
+        // 向上调整堆
+        self.heapify_up(self.count);
+    }
+    
+    // 向上调整堆
+    fn heapify_up(&mut self, mut idx: usize) {
+        let comparator = self.comparator;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if comparator(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
+    }
+    
+    // 向下调整堆
+    fn heapify_down(&mut self, mut idx: usize) {
+        let comparator = self.comparator;
+        while self.children_present(idx) {
+            let child_idx = self.smallest_child_idx(idx);
+            if comparator(&self.items[child_idx], &self.items[idx]) {
+                self.items.swap(idx, child_idx);
+                idx = child_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +93,21 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        
+        // 如果只有左子节点，返回左子节点索引
+        if right > self.count {
+            return left;
+        }
+        
+        // 比较左右子节点，返回符合比较器条件的子节点索引
+        let comparator = self.comparator;
+        if comparator(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
     }
 }
 
@@ -84,8 +133,27 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        
+        // 保存堆顶元素
+        let top = std::mem::take(&mut self.items[1]);
+        
+        // 将最后一个元素移到堆顶
+        if self.count > 1 {
+            self.items[1] = std::mem::take(&mut self.items[self.count]);
+        }
+        
+        // 减少计数
+        self.count -= 1;
+        
+        // 向下调整堆
+        if self.count > 0 {
+            self.heapify_down(1);
+        }
+        
+        Some(top)
     }
 }
 
