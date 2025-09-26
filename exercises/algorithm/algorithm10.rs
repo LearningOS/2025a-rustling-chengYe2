@@ -38,9 +38,10 @@ impl Graph for UndirectedGraph {
             self.add_node(to);
         }
         
-        // 添加边到邻接表中
+        // 对于无向图，需要在两个方向上添加边
         let adjacency_table = self.adjacency_table_mutable();
         adjacency_table.get_mut(from).unwrap().push((to.to_string(), weight));
+        adjacency_table.get_mut(to).unwrap().push((from.to_string(), weight));
     }
 }
 pub trait Graph {

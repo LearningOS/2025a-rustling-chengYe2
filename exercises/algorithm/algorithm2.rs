@@ -76,24 +76,31 @@ impl<T> LinkedList<T> {
 			return;
 		}
 		
-		// 保存当前的start节点，稍后将用作end
+		// 从当前的start节点开始遍历
 		let mut current = self.start;
-		
-		// 交换链表的start和end
-		std::mem::swap(&mut self.start, &mut self.end);
+		let mut prev = None;
 		
 		// 遍历链表，交换每个节点的next和prev指针
 		while let Some(node_ptr) = current {
 			// 安全地获取节点的可变引用
 			let node = unsafe { node_ptr.as_ptr() };
 			
-			// 交换当前节点的next和prev指针
+			// 保存下一个节点
+			let next = unsafe { (*node).next };
+			
+			// 反转当前节点的指针
 			unsafe {
-				std::mem::swap(&mut (*node).next, &mut (*node).prev);
-				// 移动到下一个节点（原来的prev节点）
-				current = (*node).next;
+				(*node).next = prev;
+				(*node).prev = next;
 			}
+			
+			// 移动到下一个节点
+			prev = current;
+			current = next;
 		}
+		
+		// 交换start和end指针
+		std::mem::swap(&mut self.start, &mut self.end);
 	}
 }
 

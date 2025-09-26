@@ -68,6 +68,8 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
+	where
+		T: PartialOrd
 	{
 		// 创建一个新的空链表来存储合并结果
 		let mut result = LinkedList::new();
@@ -110,10 +112,7 @@ impl<T> LinkedList<T> {
 		}
 		
 		// 排序值
-		values.sort_by(|a, b| unsafe {
-			// 安全的比较，需要T实现PartialOrd
-			std::ptr::read(a as *const T) < std::ptr::read(b as *const T)
-		});
+		values.sort_by(|a, b| a.partial_cmp(b).unwrap());
 		
 		// 从排序后的值构建新链表
 		for val in values {

@@ -7,7 +7,7 @@
 #[allow(unused_variables, unused_assignments)]
 fn main() {
     let my_option: Option<()> = None;
-    if let Some(_) = my_option {
+    if my_option.is_some() {
         // 只有当 my_option 不是 None 时才执行
     }
 

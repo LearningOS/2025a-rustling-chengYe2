@@ -50,8 +50,8 @@ impl From<&str> for Person {
         // 2. Split the string on commas
         let parts: Vec<&str> = s.split(',').collect();
         
-        // Check if there are at least two parts (name and age)
-        if parts.len() < 2 {
+        // Check if there are exactly two parts (name and age)
+        if parts.len() != 2 {
             return Person::default();
         }
         

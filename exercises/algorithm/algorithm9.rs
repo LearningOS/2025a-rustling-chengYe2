@@ -22,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: Vec::new(),
             comparator,
         }
     }
@@ -37,21 +37,17 @@ where
 
     pub fn add(&mut self, value: T) {
         // 扩展items向量并添加新值
+        self.items.push(value);
         self.count += 1;
-        if self.count < self.items.capacity() {
-            self.items[self.count] = value;
-        } else {
-            self.items.push(value);
-        }
         
         // 向上调整堆
-        self.heapify_up(self.count);
+        self.heapify_up(self.count - 1);
     }
     
     // 向上调整堆
     fn heapify_up(&mut self, mut idx: usize) {
         let comparator = self.comparator;
-        while idx > 1 {
+        while idx > 0 {
             let parent_idx = self.parent_idx(idx);
             if comparator(&self.items[idx], &self.items[parent_idx]) {
                 self.items.swap(idx, parent_idx);
@@ -77,19 +73,19 @@ where
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
-        idx / 2
+        (idx - 1) / 2
     }
 
     fn children_present(&self, idx: usize) -> bool {
-        self.left_child_idx(idx) <= self.count
+        self.left_child_idx(idx) < self.count
     }
 
     fn left_child_idx(&self, idx: usize) -> usize {
-        idx * 2
+        idx * 2 + 1
     }
 
     fn right_child_idx(&self, idx: usize) -> usize {
-        self.left_child_idx(idx) + 1
+        idx * 2 + 2
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
@@ -97,7 +93,7 @@ where
         let right = self.right_child_idx(idx);
         
         // 如果只有左子节点，返回左子节点索引
-        if right > self.count {
+        if right >= self.count {
             return left;
         }
         
@@ -138,19 +134,20 @@ where
         }
         
         // 保存堆顶元素
-        let top = std::mem::take(&mut self.items[1]);
-        
-        // 将最后一个元素移到堆顶
-        if self.count > 1 {
-            self.items[1] = std::mem::take(&mut self.items[self.count]);
-        }
+        let top = std::mem::take(&mut self.items[0]);
         
         // 减少计数
         self.count -= 1;
         
-        // 向下调整堆
+        // 如果还有元素，将最后一个元素移到堆顶并向下调整
         if self.count > 0 {
-            self.heapify_down(1);
+            // 弹出最后一个元素
+            let last = self.items.pop().unwrap();
+            self.items[0] = last;
+            self.heapify_down(0);
+        } else {
+            // 没有元素了，弹出最后一个元素
+            self.items.pop();
         }
         
         Some(top)

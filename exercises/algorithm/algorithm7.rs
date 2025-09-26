@@ -108,7 +108,7 @@ fn bracket_match(bracket: &str) -> bool
 	for c in bracket.chars() {
 		match c {
 			// 如果是开括号，入栈
-			'(', '{', '[' => stack.push(c),
+			'(' | '{' | '[' => stack.push(c),
 			// 如果是闭括号，检查栈顶元素是否匹配
 			')' => {
 				if stack.pop() != Some('(') {
